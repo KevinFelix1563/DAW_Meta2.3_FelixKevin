@@ -1,33 +1,40 @@
-import axios from 'axios'
-
-const API_KEY = '4426e4bd' // Reemplaza con tu API key
+const API_KEY = '4426e4bd' 
 const BASE_URL = 'https://www.omdbapi.com/'
 
-const api = axios.create({
-  baseURL: BASE_URL,
-  params: {
-    apikey: API_KEY
-  }
-})
-
 export const searchMovies = async (params) => {
-  const response = await api.get('', {
-    params: {
-      s: params.query,
-      type: params.type || 'movie',
-      y: params.year || '',
-      page: params.page || 1
-    }
+  // Construimos los parámetros de la URL manualmente
+  const queryParams = new URLSearchParams({
+    apikey: API_KEY,
+    s: params.query,
+    type: params.type || 'movie',
+    y: params.year || '',
+    page: params.page || 1
   })
-  return response.data
+
+  // Usamos fetch en lugar de axios
+  const response = await fetch(`${BASE_URL}?${queryParams.toString()}`)
+  
+  // Fetch no lanza error automáticamente con códigos HTTP 400/500, hay que validarlo
+  if (!response.ok) {
+    throw new Error(`Error HTTP: ${response.status}`)
+  }
+  
+  // Convertimos la respuesta a JSON
+  return await response.json()
 }
 
 export const getMovieDetails = async (imdbID) => {
-  const response = await api.get('', {
-    params: {
-      i: imdbID,
-      plot: 'full'
-    }
+  const queryParams = new URLSearchParams({
+    apikey: API_KEY,
+    i: imdbID,
+    plot: 'full'
   })
-  return response.data
+
+  const response = await fetch(`${BASE_URL}?${queryParams.toString()}`)
+  
+  if (!response.ok) {
+    throw new Error(`Error HTTP: ${response.status}`)
+  }
+  
+  return await response.json()
 }
