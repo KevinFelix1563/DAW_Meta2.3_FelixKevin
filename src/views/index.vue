@@ -42,7 +42,7 @@
     </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue' // <-- 1. Importamos los hooks
 import MovieSearch from '../components/MovieSearch.vue'
 import MovieList from '../components/MovieList.vue'
 import MovieDetails from '../components/MovieDetails.vue'
@@ -54,10 +54,21 @@ const selectedMovie = ref(null)
 const loading = ref(false)
 const error = ref('')
 
+
+onMounted(() => {
+  handleSearch({ query: 'Matrix', type: 'movie', year: '' })
+})
+
+onBeforeUnmount(() => {
+  movies.value = []
+  selectedMovie.value = null
+  error.value = ''
+})
+//Se limpia la pagina al cambiar a about.
+
 const handleSearch = async (searchParams) => {
   loading.value = true
   error.value = ''
-  
   try {
     const response = await searchMovies(searchParams)
     if (response.Search) {
